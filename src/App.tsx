@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
-import lake from './assets/lake.png'
+import { useEffect, useRef, useState } from 'react'
+import lake from './assets/lake.mp4'
 import lilypad from './assets/lilypad.png'
+import jumpVideo from './assets/Jump.mp4'
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -13,6 +14,26 @@ function App() {
 
   const circleRef = useRef<HTMLDivElement>(null)
   const circleTextRef = useRef<HTMLSpanElement>(null)
+
+  const [playingYear, setPlayingYear] = useState<string | null>(null)
+  const [blankYear, setBlankYear] = useState<string | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleLilypadClick = (year: string) => {
+    setPlayingYear(year)
+    if (videoRef.current) {
+      videoRef.current.play().catch(e => console.error("Video play error:", e))
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen().catch(e => console.error("Fullscreen error:", e))
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (blankYear) {
+      document.title = blankYear
+    }
+  }, [blankYear])
 
   const updatePositions = () => {
     const container = containerRef.current
@@ -42,6 +63,7 @@ function App() {
     let animationId: number
 
     const updatePosition = () => {
+      if (!containerRef.current) return // Stop loop if unmounted
       const winH = window.innerHeight
       const cH = container.offsetHeight
 
@@ -158,18 +180,29 @@ function App() {
     }
   }, [])
 
+  if (blankYear) {
+    return (
+      <div className="w-full h-screen bg-white flex items-center justify-center">
+        <h1 className="text-4xl font-bold text-gray-900">{blankYear}</h1>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full h-screen overflow-hidden bg-[#1e1e1e] fixed inset-0 touch-none">
       <div
         ref={containerRef}
         className="relative w-full will-change-transform"
       >
-        {/* Background image defining the container's height */}
-        <img
+        {/* Background video defining the container's height */}
+        <video
           src={lake}
-          alt="Lake background"
+          autoPlay
+          loop
+          muted
+          playsInline
           className="w-full h-auto block"
-          onLoad={updatePositions}
+          onLoadedData={updatePositions}
         />
 
         {/* Overlay container for the 5 lilypad sections */}
@@ -178,40 +211,45 @@ function App() {
             <img
               ref={el => { lilypadRefs.current[4] = el }}
               src={lilypad} alt="2025"
-              className="max-h-full max-w-full ml-[34%] scale-80 rotate-[30deg]"
+              className="max-h-full max-w-full ml-[34%] scale-120 rotate-[30deg] cursor-pointer"
               onLoad={updatePositions}
+              onClick={() => handleLilypadClick("2025")}
             />
           </div>
           <div className="w-full h-1/5 flex items-center">
             <img
               ref={el => { lilypadRefs.current[3] = el }}
               src={lilypad} alt="2024"
-              className="max-h-full max-w-full ml-[62%] scale-80"
+              className="max-h-full max-w-full ml-[62%] scale-120 rotate-[85deg] cursor-pointer"
               onLoad={updatePositions}
+              onClick={() => handleLilypadClick("2024")}
             />
           </div>
           <div className="w-full h-1/5 flex items-center">
             <img
               ref={el => { lilypadRefs.current[2] = el }}
               src={lilypad} alt="2023"
-              className="max-h-full max-w-full ml-[25%] scale-80"
+              className="max-h-full max-w-full ml-[25%] scale-120 rotate-[21deg] cursor-pointer"
               onLoad={updatePositions}
+              onClick={() => handleLilypadClick("2023")}
             />
           </div>
           <div className="w-full h-1/5 flex items-center">
             <img
               ref={el => { lilypadRefs.current[1] = el }}
               src={lilypad} alt="2022"
-              className="max-h-full max-w-full ml-[57%] scale-80"
+              className="max-h-full max-w-full ml-[57%] scale-120 rotate-[65deg] cursor-pointer"
               onLoad={updatePositions}
+              onClick={() => handleLilypadClick("2022")}
             />
           </div>
           <div className="w-full h-1/5 flex items-center">
             <img
               ref={el => { lilypadRefs.current[0] = el }}
               src={lilypad} alt="2021"
-              className="max-h-full max-w-full ml-[33%] scale-80"
+              className="max-h-full max-w-full ml-[33%] scale-120 rotate-[93deg] cursor-pointer"
               onLoad={updatePositions}
+              onClick={() => handleLilypadClick("2021")}
             />
           </div>
         </div>
@@ -223,6 +261,24 @@ function App() {
           style={{ transform: 'translate(-1000px, -1000px)' }} // Hidden until initialized
         >
           <span ref={circleTextRef}></span>
+        </div>
+
+        {/* Fullscreen Video Overlay */}
+        <div 
+          className={`fixed inset-0 z-50 bg-black flex items-center justify-center ${playingYear ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          <video
+            ref={videoRef}
+            src={jumpVideo}
+            playsInline
+            className="w-full h-full object-contain"
+            onEnded={() => {
+              if (document.fullscreenElement) {
+                document.exitFullscreen().catch(e => console.error("Exit fullscreen error:", e))
+              }
+              setBlankYear(playingYear)
+            }}
+          />
         </div>
       </div>
     </div>
