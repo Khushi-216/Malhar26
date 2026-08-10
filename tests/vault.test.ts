@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { supportedYears, vaultData } from "../components/vault/data.ts";
-import { chooseQuestion, isCorrect, shuffleOptions, validateQuestion } from "../components/vault/utils.ts";
+import { supportedYears, vaultData } from "../components/vault/data";
+import { chooseQuestion, isCorrect, shuffleOptions, validateQuestion } from "../components/vault/utils";
 
 test("all five year configurations are complete", () => {
   assert.deepEqual(supportedYears, ["2021", "2022", "2023", "2024", "2025"]);

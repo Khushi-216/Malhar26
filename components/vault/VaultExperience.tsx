@@ -122,7 +122,7 @@ export function VaultExperience() {
       const nextAttempts = wrongAttempts + 1;
       setWrongAttempts(nextAttempts);
       setIncorrectOptionIds((current) => current.includes(selected) ? current : [...current, selected]);
-      if (nextAttempts >= 3) {
+      if (nextAttempts >= 1) {
         setAnswerRevealed(true);
         setFeedback("The correct memory key has been revealed.");
       } else {
@@ -138,11 +138,11 @@ export function VaultExperience() {
       <Atmosphere variant={config.variant} />
       <header className="topbar">
         <div><p>Malhar Archives</p><h1>{config.year} · {config.title}</h1><span>{config.subtitle}</span></div>
-        <label className="year-picker">Demo year
+        {/* <label className="year-picker">Demo year
           <select value={year} onChange={(event) => changeYear(event.target.value)} disabled={unlocking}>
             {supportedYears.map((value) => <option key={value}>{value}</option>)}
           </select>
-        </label>
+        </label> */}
       </header>
 
       <div className="experience">
@@ -172,7 +172,7 @@ export function VaultExperience() {
           </div>
           <p className={`feedback${wrongAttempts ? " feedback-error" : ""}${answerRevealed ? " feedback-revealed" : ""}`} role="status" aria-live="polite">{feedback || "Choose a memory key or skip to release the lock."}</p>
           <ol className="sequence" aria-label="Unlock sequence">
-            {["Alignment", "Wheel", "Bars", "Bolts", "Door"].map((label, index) => <li key={label} className={["activating","wheel","bars","bolts","opening","open","zooming"].indexOf(status) >= index ? "done" : ""}>{label}</li>)}
+            {["Alignment", "Wheel", "Bars", "Bolts", "Door"].map((label, index) => <li key={label} className={["activating", "wheel", "bars", "bolts", "opening", "open", "zooming"].indexOf(status) >= index ? "done" : ""}>{label}</li>)}
           </ol>
         </form>
       </div>
